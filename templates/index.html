@@ -4,69 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shipment Tracker</title>
-    <link href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" rel="stylesheet"/>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsYD+Yun7krjEhUWgeNQ2WfHJgMiQ0m4YOuTRF3z9JkMfmG3t22QhqVUzMAF6Zl" crossorigin="anonymous">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom Styles -->
     <style>
         #map-origin, #map-destination {
-            height: 300px;
+            height: 400px;
         }
-        .map-container {
-            margin-bottom: 20px;
+        .map-heading {
+            padding-top: 20px;
+            font-size: 24px;
         }
-        .animate__animated.animate__fadeIn {
-            animation-duration: 1.5s;
-            animation-fill-mode: both;
+        .btn-custom {
+            width: 100%;
+            padding: 10px;
+            font-size: 20px;
+        }
+        @media (max-width: 768px) {
+            .btn-custom {
+                font-size: 16px;
+                padding: 8px;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container py-5">
-    <h1 class="mb-4 text-center">Shipment Tracker</h1>
+    <h2 class="mb-4 text-center">Shipment Tracker</h2>
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card mb-4 animate__animated animate__fadeIn">
+        <div class="col-md-10">
+            <div class="card mb-4 shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">Shipment Details</h5>
-                    <p class="card-text"><strong>Truck ID:</strong> <span id="truck-id">Loading...</span></p>
-                    <p class="card-text"><strong>Shipment Pickup Date and Time:</strong> <span id="pickup-date">Loading...</span></p>
+                    <h4 class="card-title">Shipment Details</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="card-text"><strong>Truck ID:</strong> <span id="truck-id">Loading...</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="card-text"><strong>Shipment Pickup Date and Time:</strong> <span id="pickup-date">Loading...</span></p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="map-container animate__animated animate__fadeIn">
-                <h5>Shipment Origin</h5>
-                <div id="map-origin"></div>
+            <div class="mb-4 shadow-sm">
+                <h5 class="map-heading">Shipment Origin</h5>
+                <div id="map-origin" class="shadow-sm"></div>
             </div>
-            <div class="map-container animate__animated animate__fadeIn">
-                <h5>Shipment Destination</h5>
-                <div id="map-destination"></div>
+            <div class="mb-4 shadow-sm">
+                <h5 class="map-heading">Shipment Destination</h5>
+                <div id="map-destination" class="shadow-sm"></div>
             </div>
-            <div class="text-center animate__animated animate__fadeIn">
-                <button id="start-stop-shipment" class="btn btn-primary" onclick="startStopShipment()">Start Shipment</button>
-            </div>
+            <button id="start-stop-shipment" class="btn btn-primary btn-custom" onclick="startStopShipment()">Start Shipment</button>
         </div>
     </div>
 </div>
 
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<!-- Bootstrap Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     function initMaps(shipmentData) {
         const originCoords = [shipmentData.shipmentOrigin.coordinates[0], shipmentData.shipmentOrigin.coordinates[1]];
         const destinationCoords = [shipmentData.shipmentDestination.coordinates[0], shipmentData.shipmentDestination.coordinates[1]];
 
+        // Initialize map for Shipment Origin
         const mapOrigin = L.map('map-origin').setView(originCoords, 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(mapOrigin);
-        L.marker(originCoords).addTo(mapOrigin)
-            .bindPopup('Shipment Origin');
+        L.marker(originCoords).addTo(mapOrigin).bindPopup('Shipment Origin');
 
+        // Initialize map for Shipment Destination
         const mapDestination = L.map('map-destination').setView(destinationCoords, 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(mapDestination);
-        L.marker(destinationCoords).addTo(mapDestination)
-            .bindPopup('Shipment Destination');
+        L.marker(destinationCoords).addTo(mapDestination).bindPopup('Shipment Destination');
     }
 
     function fetchShipmentDataAndInitMaps() {
@@ -83,13 +100,11 @@
         fetch('/start_shipment', {method: 'POST'}).then(response => response.json()).then(data => {
             const button = document.getElementById('start-stop-shipment');
             button.textContent = data.status === 'started' ? 'Stop Shipment' : 'Start Shipment';
-            button.className = data.status === 'started' ? 'btn btn-danger' : 'btn btn-primary';
+            button.className = data.status === 'started' ? 'btn btn-danger btn-custom' : 'btn btn-primary btn-custom';
         });
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        fetchShipmentDataAndInitMaps();
-    });
+    document.addEventListener('DOMContentLoaded', fetchShipmentDataAndInitMaps);
 </script>
 </body>
 </html>
