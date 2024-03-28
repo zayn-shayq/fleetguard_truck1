@@ -9,13 +9,17 @@ import os
 from azure.storage.blob import BlobServiceClient
 from pymongo import MongoClient
 import re
+from flask import Flask, render_template, jsonify, request
+import requests
+import subprocess
+
 
 # Azure Blob Storage and MongoDB setup
 CONNECTION_STRING = 'DefaultEndpointsProtocol=https;AccountName=crimescene;AccountKey=IRI+NPBsx1esOBfDeaKcrRsOHHlpgKuS2RwURVRFPVpv+NeUpuZEMuIV6sPkDh5KQ4gOSawY9hC4+AStbhinCA==;EndpointSuffix=core.windows.net'
 CONTAINER_NAME = "post"
 MONGO_CONNECTION_STRING = 'mongodb+srv://fyp:fyp@fyp.h8p1vij.mongodb.net/'
 DATABASE_NAME = 'test'
-COLLECTION_NAME = 'pidata'
+COLLECTION_NAME = 'pidatas'
 
 # Initialize Azure Blob Service Client
 blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
@@ -110,7 +114,12 @@ def upload_image_to_azure(file_path):
     return blob_client.url
 
 
+def get_shipmentID():
+    response = requests.get('https://fleetguard.azurewebsites.net/api/driver/shipment/upcoming/6605a7187d1cac50c0409fe7')
+    data = response.json()
+    return data.shipmentID
 
+    return shipmentID
 
 
 while True:
@@ -127,9 +136,12 @@ while True:
     
     # Get GPS data
     lat, lng = get_gps_data()
+
+    shipmentID = get_shipmentID()
     
     # Combine data
     combined_data = {
+        "shipmentID": shipmentID,
         "timestamp": datetime.now(),
         "image_url": image_url,
         "temperature": temperature,
