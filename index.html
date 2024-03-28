@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shipment Tracker</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=e01c02a261ca47fcaa6616ba72fa2d41"></script>
+    <script>
+        let mapOrigin, mapDestination;
+
+        function initMap() {
+            fetch('/api/shipment').then(response => response.json()).then(data => {
+                const shipmentData = data.data;
+                document.getElementById('truck-id').textContent = 'Truck ID: 65638e3976ae0218036170b3';
+                document.getElementById('pickup-date').textContent = 'Shipment Pickup Date and Time: ' + shipmentData.shipmentPickDate;
+
+                const origin = {lat: shipmentData.shipmentOrigin.coordinates[0], lng: shipmentData.shipmentOrigin.coordinates[1]};
+                const destination = {lat: shipmentData.shipmentDestination.coordinates[0], lng: shipmentData.shipmentDestination.coordinates[1]};
+
+                mapOrigin = new google.maps.Map(document.getElementById('map-origin'), {
+                    center: origin,
+                    zoom: 8
+                });
+
+                mapDestination = new google.maps.Map(document.getElementById('map-destination'), {
+                    center: destination,
+                    zoom: 8
+                });
+
+                new google.maps.Marker({position: origin, map: mapOrigin});
+                new google.maps.Marker({position: destination, map: mapDestination});
+            });
+
+            setInterval(() => {
+                fetch('/api/shipment').then(response => response.json()).then(data => {
+                    // Update your UI here if needed
+                });
+            }, 1000);
+        }
+
+        function startStopShipment() {
+            fetch('/start_shipment', {method: 'POST'}).then(response => response.json()).then(data => {
+                document.getElementById('start-stop-shipment').textContent = data.status === 'started' ? 'Stop Shipment' : 'Start Shipment';
+            });
+        }
+    </script>
+</head>
+<body onload="initMap()">
+    <div id="truck-id"></div>
+    <div id="pickup-date"></div>
+    <div id="map-origin" style="width: 400px; height: 300px;"></div>
+    <div id="map-destination" style="width: 400px; height: 300px;"></div>
+    <button id="start-stop-shipment" onclick="startStopShipment()">Start Shipment</button>
+</body>
+</html>
