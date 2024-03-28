@@ -141,7 +141,7 @@ while True:
 
     
     #shipmentID = get_shipmentID()
-    get_shipmentID()
+    #get_shipmentID()
     # Combine data
     combined_data = {
         #"shipmentID": shipmentID,
