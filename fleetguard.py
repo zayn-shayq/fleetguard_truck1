@@ -118,9 +118,11 @@ while True:
         "latitude": lat,
         "longitude": lng
     }
+
+    print(f"Data saved: {combined_data}")
+
     
     # Save data to MongoDB
     collection.insert_one(combined_data)
-    print(f"Data saved: {combined_data}")
 
     time.sleep(5)  # Sleep for 5 seconds before the next read
