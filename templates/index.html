@@ -2,53 +2,94 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shipment Tracker</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=e01c02a261ca47fcaa6616ba72fa2d41"></script>
-    <script>
-        let mapOrigin, mapDestination;
-
-        function initMap() {
-            fetch('/api/shipment').then(response => response.json()).then(data => {
-                const shipmentData = data.data;
-                document.getElementById('truck-id').textContent = 'Truck ID: 65638e3976ae0218036170b3';
-                document.getElementById('pickup-date').textContent = 'Shipment Pickup Date and Time: ' + shipmentData.shipmentPickDate;
-
-                const origin = {lat: shipmentData.shipmentOrigin.coordinates[0], lng: shipmentData.shipmentOrigin.coordinates[1]};
-                const destination = {lat: shipmentData.shipmentDestination.coordinates[0], lng: shipmentData.shipmentDestination.coordinates[1]};
-
-                mapOrigin = new google.maps.Map(document.getElementById('map-origin'), {
-                    center: origin,
-                    zoom: 8
-                });
-
-                mapDestination = new google.maps.Map(document.getElementById('map-destination'), {
-                    center: destination,
-                    zoom: 8
-                });
-
-                new google.maps.Marker({position: origin, map: mapOrigin});
-                new google.maps.Marker({position: destination, map: mapDestination});
-            });
-
-            setInterval(() => {
-                fetch('/api/shipment').then(response => response.json()).then(data => {
-                    // Update your UI here if needed
-                });
-            }, 1000);
+    <link href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsYD+Yun7krjEhUWgeNQ2WfHJgMiQ0m4YOuTRF3z9JkMfmG3t22QhqVUzMAF6Zl" crossorigin="anonymous">
+    <style>
+        #map-origin, #map-destination {
+            height: 300px;
         }
-
-        function startStopShipment() {
-            fetch('/start_shipment', {method: 'POST'}).then(response => response.json()).then(data => {
-                document.getElementById('start-stop-shipment').textContent = data.status === 'started' ? 'Stop Shipment' : 'Start Shipment';
-            });
+        .map-container {
+            margin-bottom: 20px;
         }
-    </script>
+        .animate__animated.animate__fadeIn {
+            animation-duration: 1.5s;
+            animation-fill-mode: both;
+        }
+    </style>
 </head>
-<body onload="initMap()">
-    <div id="truck-id"></div>
-    <div id="pickup-date"></div>
-    <div id="map-origin" style="width: 400px; height: 300px;"></div>
-    <div id="map-destination" style="width: 400px; height: 300px;"></div>
-    <button id="start-stop-shipment" onclick="startStopShipment()">Start Shipment</button>
+<body>
+
+<div class="container py-5">
+    <h1 class="mb-4 text-center">Shipment Tracker</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card mb-4 animate__animated animate__fadeIn">
+                <div class="card-body">
+                    <h5 class="card-title">Shipment Details</h5>
+                    <p class="card-text"><strong>Truck ID:</strong> <span id="truck-id">Loading...</span></p>
+                    <p class="card-text"><strong>Shipment Pickup Date and Time:</strong> <span id="pickup-date">Loading...</span></p>
+                </div>
+            </div>
+            <div class="map-container animate__animated animate__fadeIn">
+                <h5>Shipment Origin</h5>
+                <div id="map-origin"></div>
+            </div>
+            <div class="map-container animate__animated animate__fadeIn">
+                <h5>Shipment Destination</h5>
+                <div id="map-destination"></div>
+            </div>
+            <div class="text-center animate__animated animate__fadeIn">
+                <button id="start-stop-shipment" class="btn btn-primary" onclick="startStopShipment()">Start Shipment</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function initMaps(shipmentData) {
+        const originCoords = [shipmentData.shipmentOrigin.coordinates[0], shipmentData.shipmentOrigin.coordinates[1]];
+        const destinationCoords = [shipmentData.shipmentDestination.coordinates[0], shipmentData.shipmentDestination.coordinates[1]];
+
+        const mapOrigin = L.map('map-origin').setView(originCoords, 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(mapOrigin);
+        L.marker(originCoords).addTo(mapOrigin)
+            .bindPopup('Shipment Origin');
+
+        const mapDestination = L.map('map-destination').setView(destinationCoords, 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(mapDestination);
+        L.marker(destinationCoords).addTo(mapDestination)
+            .bindPopup('Shipment Destination');
+    }
+
+    function fetchShipmentDataAndInitMaps() {
+        fetch('/api/shipment').then(response => response.json()).then(data => {
+            const shipmentData = data.data;
+            document.getElementById('truck-id').textContent = '65638e3976ae0218036170b3';
+            document.getElementById('pickup-date').textContent = new Date(shipmentData.shipmentPickDate).toLocaleString();
+
+            initMaps(shipmentData);
+        });
+    }
+
+    function startStopShipment() {
+        fetch('/start_shipment', {method: 'POST'}).then(response => response.json()).then(data => {
+            const button = document.getElementById('start-stop-shipment');
+            button.textContent = data.status === 'started' ? 'Stop Shipment' : 'Start Shipment';
+            button.className = data.status === 'started' ? 'btn btn-danger' : 'btn btn-primary';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchShipmentDataAndInitMaps();
+    });
+</script>
 </body>
 </html>
