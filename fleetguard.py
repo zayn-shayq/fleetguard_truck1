@@ -65,16 +65,21 @@ def get_gps_data():
     port = "/dev/ttyAMA0"
     try:
         ser = serial.Serial(port, baudrate=9600, timeout=0.5)
-        newdata = ser.readline().decode('unicode_escape').strip()
-        if newdata.startswith("$GPRMC"):
-            newmsg = pynmea2.parse(newdata)
-            print(f"GPS Data: {newmsg.latitude}, {newmsg.longitude}")
-            return newmsg.latitude, newmsg.longitude
-        else:
-            print(f"Invalid GPS data: {newdata}")
+        for attempt in range(10):  # Try to read up to 10 lines to find a valid $GPRMC sentence
+            newdata = ser.readline().decode('unicode_escape').strip()
+            if newdata.startswith("$GPRMC"):
+                newmsg = pynmea2.parse(newdata)
+                if newmsg.latitude != 0.0 and newmsg.longitude != 0.0:
+                    print(f"GPS Data: {newmsg.latitude}, {newmsg.longitude}")
+                    return newmsg.latitude, newmsg.longitude
+                else:
+                    print("Waiting for valid GPS fix...")
+            else:
+                print(f"Received different GPS data: {newdata}")
     except Exception as e:
         print(f"Error reading GPS data: {e}")
     return None, None
+
 
 def capture_and_resize_image():
     global timestamp  # Declare timestamp as global
