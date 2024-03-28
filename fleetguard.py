@@ -11,7 +11,7 @@ from pymongo import MongoClient
 import re
 
 # Azure Blob Storage and MongoDB setup
-CONNECTION_STRING = 'DefaultEndpointsProtocol=https;AccountName=yourAccountName;AccountKey=yourAccountKey;EndpointSuffix=core.windows.net'
+CONNECTION_STRING = 'DefaultEndpointsProtocol=https;AccountName=crimescene;AccountKey=IRI+NPBsx1esOBfDeaKcrRsOHHlpgKuS2RwURVRFPVpv+NeUpuZEMuIV6sPkDh5KQ4gOSawY9hC4+AStbhinCA==;EndpointSuffix=core.windows.net'
 CONTAINER_NAME = "post"
 MONGO_CONNECTION_STRING = 'mongodb+srv://fyp:fyp@fyp.h8p1vij.mongodb.net/'
 DATABASE_NAME = 'test'
@@ -101,7 +101,7 @@ def upload_image_to_azure(file_path):
 while True:
     # Capture and process image
     image_file = capture_and_resize_image()
-    image_url = ""
+    image_url = f"{timestamp}.jpg"
     if image_file:
         image_url = upload_image_to_azure(image_file)
     
