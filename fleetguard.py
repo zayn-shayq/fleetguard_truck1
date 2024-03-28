@@ -69,7 +69,7 @@ def get_gps_data():
     port = "/dev/ttyAMA0"
     try:
         ser = serial.Serial(port, baudrate=9600, timeout=0.5)
-        time.sleep(3)
+        time.sleep(2)
         for attempt in range(10):  # Try to read up to 10 lines to find a valid $GPRMC sentence
             newdata = ser.readline().decode('unicode_escape').strip()
             if newdata.startswith("$GPRMC"):
