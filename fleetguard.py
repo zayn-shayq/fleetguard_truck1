@@ -115,7 +115,7 @@ def upload_image_to_azure(file_path):
 
 
 def get_shipmentID():
-    response = requests.get('https://fleetguard.azurewebsites.net/api/driver/shipment/upcoming/6605a7187d1cac50c0409fe7')
+    response = requests.get('https://fleetguard.azurewebsites.net/api/driver/shipment/start/6605c894175a3ee13ed6f25a')
     data = response.json()
     print(data)
     print(data.shipmentID)
