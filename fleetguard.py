@@ -62,16 +62,18 @@ def read_sensor_data():
     return actual_temp, acceleration
 
 def get_gps_data():
-    # Assuming GPS data can be read as below; adapt as necessary for your setup
     port = "/dev/ttyAMA0"
-    ser = serial.Serial(port, baudrate=9600, timeout=0.5)
-    newdata = ser.readline().decode('unicode_escape')
-    if newdata[0:6] == "$GPRMC":
-        newmsg = pynmea2.parse(newdata)
-        lat = newmsg.latitude
-        lng = newmsg.longitude
-        print(lat, lng)
-        return lat, lng
+    try:
+        ser = serial.Serial(port, baudrate=9600, timeout=0.5)
+        newdata = ser.readline().decode('unicode_escape').strip()
+        if newdata.startswith("$GPRMC"):
+            newmsg = pynmea2.parse(newdata)
+            print(f"GPS Data: {newmsg.latitude}, {newmsg.longitude}")
+            return newmsg.latitude, newmsg.longitude
+        else:
+            print(f"Invalid GPS data: {newdata}")
+    except Exception as e:
+        print(f"Error reading GPS data: {e}")
     return None, None
 
 def capture_and_resize_image():
@@ -102,7 +104,12 @@ def upload_image_to_azure(file_path):
     os.remove(file_path)  # Remove the file once uploaded
     return blob_client.url
 
+
+
+
+
 while True:
+    
     # Capture and process image
     image_file = capture_and_resize_image()
     image_url = f"{timestamp}.jpg"  # Use timestamp variable
