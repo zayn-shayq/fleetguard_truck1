@@ -117,6 +117,8 @@ def upload_image_to_azure(file_path):
 def get_shipmentID():
     response = requests.get('https://fleetguard.azurewebsites.net/api/driver/shipment/upcoming/6605a7187d1cac50c0409fe7')
     data = response.json()
+    print(data)
+    print(data.shipmentID)
     return data.shipmentID
 
     return shipmentID
@@ -137,11 +139,12 @@ while True:
     # Get GPS data
     lat, lng = get_gps_data()
 
-    shipmentID = get_shipmentID()
     
+    #shipmentID = get_shipmentID()
+    get_shipmentID()
     # Combine data
     combined_data = {
-        "shipmentID": shipmentID,
+        #"shipmentID": shipmentID,
         "timestamp": datetime.now(),
         "image_url": image_url,
         "temperature": temperature,
