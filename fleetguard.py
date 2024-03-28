@@ -117,15 +117,17 @@ def upload_image_to_azure(file_path):
 
 def get_shipmentID():
     try:
-        response = requests.get('https://fleetguard.azurewebsites.net/api/driver/shipment/start/6605c894175a3ee13ed6f25a')
+        response = requests.put('https://fleetguard.azurewebsites.net/api/driver/shipment/start/6605cddc175a3ee13ed6f2eb')
+        response.raise_for_status()  # Raises an error for bad responses (4xx, 5xx)
         data = response.json()
-        print(data)
         shipmentID = data.get("shipmentID", "")
-        print(shipmentID)
         return shipmentID
-    except Exception as e:
-        print(f"Failed to get shipmentID: {e}")
-        return ""
+    except requests.RequestException as e:
+        print(f"Request failed: {e}")
+    except ValueError:
+        print("Invalid JSON response")
+    return ""
+
 
 
 while True:
