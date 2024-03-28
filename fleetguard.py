@@ -55,6 +55,7 @@ def read_sensor_data():
     Ay = acc_y / 16384.0
     Az = acc_z / 16384.0
     acceleration = math.sqrt(Ax**2 + Ay**2 + Az**2) * 9.81  # Acceleration in m/s^2
+    print(actual_temp, acceleration)
     return actual_temp, acceleration
 
 def get_gps_data():
@@ -66,6 +67,7 @@ def get_gps_data():
         newmsg = pynmea2.parse(newdata)
         lat = newmsg.latitude
         lng = newmsg.longitude
+        print(lat, lng)
         return lat, lng
     return None, None
 
@@ -103,6 +105,7 @@ while True:
     if image_file:
         image_url = upload_image_to_azure(image_file)
     
+
     # Read sensor data
     temperature, acceleration = read_sensor_data()
     
