@@ -11,11 +11,12 @@ from pymongo import MongoClient
 import re
 
 # Azure Blob Storage and MongoDB setup
-CONNECTION_STRING = 'DefaultEndpointsProtocol=https;AccountName=<AccountName>;AccountKey=<AccountKey>;EndpointSuffix=core.windows.net'
-CONTAINER_NAME = "<ContainerName>"
-MONGO_CONNECTION_STRING = 'mongodb+srv://<username>:<password>@<your-cluster-url>/<dbname>?retryWrites=true&w=majority'
-DATABASE_NAME = "<DatabaseName>"
-COLLECTION_NAME = "<CollectionName>"
+# Azure Storage and MongoDB setup
+connection_string = 'DefaultEndpointsProtocol=https;AccountName=yourAccountName;AccountKey=yourAccountKey;EndpointSuffix=core.windows.net'
+container_name = "post"
+mongo_client = MongoClient('mongodb+srv://fyp:fyp@fyp.h8p1vij.mongodb.net/')
+db = mongo_client['test']
+collection = db['pidata']
 
 # Initialize Azure Blob Service Client
 blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
