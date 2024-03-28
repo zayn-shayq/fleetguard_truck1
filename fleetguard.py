@@ -11,12 +11,11 @@ from pymongo import MongoClient
 import re
 
 # Azure Blob Storage and MongoDB setup
-# Azure Storage and MongoDB setup
-connection_string = 'DefaultEndpointsProtocol=https;AccountName=yourAccountName;AccountKey=yourAccountKey;EndpointSuffix=core.windows.net'
-container_name = "post"
-mongo_client = MongoClient('mongodb+srv://fyp:fyp@fyp.h8p1vij.mongodb.net/')
-db = mongo_client['test']
-collection = db['pidata']
+CONNECTION_STRING = 'DefaultEndpointsProtocol=https;AccountName=yourAccountName;AccountKey=yourAccountKey;EndpointSuffix=core.windows.net'
+CONTAINER_NAME = "post"
+MONGO_CONNECTION_STRING = 'mongodb+srv://fyp:fyp@fyp.h8p1vij.mongodb.net/'
+DATABASE_NAME = 'test'
+COLLECTION_NAME = 'pidata'
 
 # Initialize Azure Blob Service Client
 blob_service_client = BlobServiceClient.from_connection_string(CONNECTION_STRING)
@@ -124,5 +123,4 @@ while True:
     collection.insert_one(combined_data)
     print(f"Data saved: {combined_data}")
 
-    print(f"Data saved: {combined_data}")
     time.sleep(5)  # Sleep for 5 seconds before the next read
