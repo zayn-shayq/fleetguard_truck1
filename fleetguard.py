@@ -69,6 +69,7 @@ def get_gps_data():
     port = "/dev/ttyAMA0"
     try:
         ser = serial.Serial(port, baudrate=9600, timeout=0.5)
+        time.sleep(3)
         for attempt in range(10):  # Try to read up to 10 lines to find a valid $GPRMC sentence
             newdata = ser.readline().decode('unicode_escape').strip()
             if newdata.startswith("$GPRMC"):
@@ -88,7 +89,7 @@ def get_gps_data():
 def capture_and_resize_image():
     global timestamp  # Declare timestamp as global
     cam = cv2.VideoCapture(0)
-    time.sleep(2)  # Warm-up time for the camera
+    time.sleep(3)  # Warm-up time for the camera
     ret, frame = cam.read()
     cam.release()
     if ret:
@@ -116,7 +117,7 @@ def upload_image_to_azure(file_path):
 
 def get_shipmentID():
     try:
-        response = requests.get('Your_API_Endpoint')
+        response = requests.get('https://fleetguard.azurewebsites.net/api/driver/shipment/start/6605c894175a3ee13ed6f25a')
         data = response.json()
         print(data)
         shipmentID = data.get("shipmentID", "")
