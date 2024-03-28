@@ -30,6 +30,9 @@ collection = db[COLLECTION_NAME]
 bus = smbus.SMBus(1)  # Assuming using I2C bus 1
 DEVICE_ADDRESS = 0x68  # MPU6050 device address
 
+# Define timestamp variable
+timestamp = None
+
 def MPU_Init():
     bus.write_byte_data(DEVICE_ADDRESS, 0x6B, 1)  # Wake the MPU6050 up as it starts in sleep mode
     bus.write_byte_data(DEVICE_ADDRESS, 0x1B, 0)  # Set gyro full scale range
@@ -72,6 +75,7 @@ def get_gps_data():
     return None, None
 
 def capture_and_resize_image():
+    global timestamp  # Declare timestamp as global
     cam = cv2.VideoCapture(0)
     time.sleep(2)  # Warm-up time for the camera
     ret, frame = cam.read()
@@ -101,7 +105,7 @@ def upload_image_to_azure(file_path):
 while True:
     # Capture and process image
     image_file = capture_and_resize_image()
-    image_url = f"{timestamp}.jpg"
+    image_url = f"{timestamp}.jpg"  # Use timestamp variable
     if image_file:
         image_url = upload_image_to_azure(image_file)
     
