@@ -13,7 +13,7 @@ def index():
 
 @app.route('/api/shipment')
 def get_shipment():
-    response = requests.get('https://fleetguard.azurewebsites.net/api/driver/shipment/upcoming/6605a7187d1cac50c0409fe7')
+    response = requests.get('https://fleetguard.azurewebsites.net/api/driver/shipment/upcoming/66067990926c6761c996c3ca')
     data = response.json()
     return jsonify(data)
 
